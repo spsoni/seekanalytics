@@ -4,6 +4,11 @@ from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
 
 
+def convert_to_list_of_dict(result):
+    # convert to list of dictionary for unit testing convenience
+    return [row.asDict(recursive=True) for row in result]
+
+
 class JobData:
     schema = StructType(fields=[
         StructField('id', StringType(), True),
@@ -43,9 +48,14 @@ class JobData:
         if df is None:
             df = self.df
 
-        # This is an average salary for different roles job history for an individual.
+        # Assumption: This is an average salary for different roles job history for an individual.
         # This is not an average income calculation here, otherwise we will have to add
         # weight (number of years) of each work experience
+
+        # Note: intentionally avoiding complex aggregate function here to highlight
+        # simplicity approach for readability and less coginitive load for fellow team members.
+        # Rest of the other transform functions are using complex aggregate function, which looses
+        # some readability and simplicity
 
         df = df.withColumn(
             'salary_sum',

@@ -1,9 +1,5 @@
 from pyspark.sql import functions as F
-from job_data import JobData
-
-
-def convert_to_list_of_dict(result):
-    return [row.asDict(recursive=True) for row in result]
+from job_data import JobData, convert_to_list_of_dict
 
 
 class JobDataAnswers(JobData):
