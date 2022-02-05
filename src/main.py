@@ -2,11 +2,15 @@ from pyspark.sql import functions as F
 from job_data import JobData
 
 
+def convert_to_list_of_dict(result):
+    return [row.asDict(recursive=True) for row in result]
+
+
 class JobDataAnswers(JobData):
     def answer_2(self):
         print('2. Print the schema')
         self.df.printSchema()
-        return self.df
+        return self.df.schema
 
     def answer_3(self):
         print('3. How many records are there in the dataset?')
@@ -22,8 +26,8 @@ class JobDataAnswers(JobData):
         df = df.drop('jobHistory')
         df = df.orderBy(
             F.col('profile.lastName').desc()
-        )
-        df.show(n=10, truncate=False)
+        ).limit(10)
+        df.show(truncate=False)
         return df
 
     def answer_5(self):
@@ -32,8 +36,9 @@ class JobDataAnswers(JobData):
         df = df.select(
             F.avg('salary').alias('average_salary_for_entire_dataset')
         )
-        df.show()
-        return df
+        data = df.collect()[0].asDict()
+        print(data['average_salary_for_entire_dataset'])
+        return data['average_salary_for_entire_dataset']
 
     def answer_6(self):
         print('''6. On average, what are the top 5 paying jobs? 
@@ -47,20 +52,26 @@ class JobDataAnswers(JobData):
         )
 
         print('6.1. Top 5:')
-        df.orderBy(
-            F.col('average_salary').desc(),
-            F.col('title'),
-            F.col('location')
-        ).show(n=5, truncate=False)
+        data_top_5 = (
+            df.orderBy(
+                F.col('average_salary').desc(),
+                F.col('title'),
+                F.col('location')
+            ).limit(5).collect()
+        )
+        print(data_top_5)
 
         print('6.2. Bottom 5:')
-        df.orderBy(
-            F.col('average_salary'),
-            F.col('title'),
-            F.col('location')
-        ).show(n=5, truncate=False)
+        data_bottom_5 = (
+            df.orderBy(
+                F.col('average_salary'),
+                F.col('title'),
+                F.col('location')
+            ).limit(5).collect()
+        )
+        print(data_bottom_5)
 
-        return df
+        return convert_to_list_of_dict(data_top_5), convert_to_list_of_dict(data_bottom_5)
 
     def answer_7(self):
         print('''7. Who is currently making the most money? 
@@ -75,9 +86,10 @@ class JobDataAnswers(JobData):
             F.col('salary').desc(),
             F.col('lastName').desc(),
             F.col('fromDate').desc()
-        )
-        df.show(n=1, truncate=False)
-        return df
+        ).limit(1)
+        result = df.collect()[0]
+        print(result)
+        return result.asDict()
 
     def answer_8(self):
         print('''8. What was the most popular job title started in 2019?''')
@@ -95,9 +107,10 @@ class JobDataAnswers(JobData):
         df = df.orderBy(
             F.col('jobs_count').desc(),
             F.col('average_salary').desc()
-        )
-        df.show(n=1, truncate=False)
-        return df
+        ).limit(1)
+        result = df.collect()[0]
+        print(result)
+        return result.asDict()
 
     def answer_9(self):
         print('''9. How many people are currently working?''')
@@ -119,9 +132,10 @@ class JobDataAnswers(JobData):
         df = df.orderBy(
             F.col('lastName').desc(),
             F.col('firstName')
-        )
-        df.show(n=10, truncate=False)
-        return df
+        ).limit(10)
+        result = df.collect()
+        print(result)
+        return convert_to_list_of_dict(result)
 
     def answer_11(self):
         print('''11. For each person, list their highest paying job along 
@@ -130,9 +144,10 @@ class JobDataAnswers(JobData):
         out 10 results''')
         df = self.transform_job_with_max_salary_for_each_profile()
         df = df.select('id', 'profile.*', 'job_max')
-        df = df.drop('jobHistory')
-        df.show(n=10, truncate=False)
-        return df
+        df = df.drop('jobHistory').limit(10)
+        result = df.collect()
+        print(result)
+        return convert_to_list_of_dict(result)
 
     def all_answers(self):
         self.answer_2()

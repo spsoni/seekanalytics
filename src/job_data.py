@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame
 
 class JobData:
     schema = StructType(fields=[
-        StructField('id', StringType(), False),
+        StructField('id', StringType(), True),
         StructField(
             'profile',
             StructType([
@@ -18,7 +18,7 @@ class JobData:
                         StructField('location', StringType(), True),
                         StructField('salary', IntegerType(), True),
                         StructField('fromDate', StringType(), True),
-                        StructField('toDate', StringType(), False),
+                        StructField('toDate', StringType(), True),
                     ])
                 ))
             ])
