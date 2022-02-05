@@ -114,7 +114,7 @@ class JobDataAnswers(JobData):
             F.col('jobs_count').desc(),
             F.col('average_salary').desc()
         ).limit(1)
-        df.show(truncate=False, vertical=True)
+        df.show(truncate=False)
         result = df.collect()[0]
         return result.asDict()
 
