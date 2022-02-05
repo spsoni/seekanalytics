@@ -34,6 +34,7 @@ class JobData:
         self.path = path
         self.data_format = data_format
         self.spark = SparkSession.builder.getOrCreate()
+        self.spark.sparkContext.setLogLevel("OFF")
         self._df: DataFrame = None
 
     @property
