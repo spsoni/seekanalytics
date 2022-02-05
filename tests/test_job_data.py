@@ -16,7 +16,7 @@ def test_init(data_job):
     assert isinstance(data_job, JobData)
     assert isinstance(data_job.df, DataFrame)
     assert data_job.schema == data_job.df.schema
-    assert data_job.df.count() == 10
+    assert data_job.df.count() == 20
 
 
 def test_transform_averge_salary_for_each_profile(data_job):
