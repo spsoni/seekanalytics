@@ -1,3 +1,4 @@
+from os.path import dirname, abspath, join
 from pyspark.sql import functions as F
 from job_data import JobData, convert_to_list_of_dict
 
@@ -48,26 +49,35 @@ class JobDataAnswers(JobData):
         )
 
         print('6.1. Top 5:')
-        data_top_5 = (
+        data_top_5_df = (
             df.orderBy(
                 F.col('average_salary').desc(),
                 F.col('title'),
                 F.col('location')
-            ).limit(5).collect()
+            ).limit(5)
         )
-        print(data_top_5)
+        data_top_5_df.show(truncate=False)
+        data_top_5 = data_top_5_df.collect()
 
         print('6.2. Bottom 5:')
-        data_bottom_5 = (
+        data_bottom_5_df = (
             df.orderBy(
                 F.col('average_salary'),
                 F.col('title'),
                 F.col('location')
-            ).limit(5).collect()
+            ).limit(5)
         )
-        print(data_bottom_5)
+        data_bottom_5_df.show(truncate=False)
+        data_bottom_5 = data_bottom_5_df.collect()
 
-        return convert_to_list_of_dict(data_top_5), convert_to_list_of_dict(data_bottom_5)
+        return (
+            convert_to_list_of_dict(
+                data_top_5
+            ),
+            convert_to_list_of_dict(
+                data_bottom_5
+            )
+        )
 
     def answer_7(self):
         print('''7. Who is currently making the most money? 
@@ -83,8 +93,8 @@ class JobDataAnswers(JobData):
             F.col('lastName').desc(),
             F.col('fromDate').desc()
         ).limit(1)
+        df.show(truncate=False, vertical=True)
         result = df.collect()[0]
-        print(result)
         return result.asDict()
 
     def answer_8(self):
@@ -104,8 +114,8 @@ class JobDataAnswers(JobData):
             F.col('jobs_count').desc(),
             F.col('average_salary').desc()
         ).limit(1)
+        df.show(truncate=False, vertical=True)
         result = df.collect()[0]
-        print(result)
         return result.asDict()
 
     def answer_9(self):
@@ -129,8 +139,8 @@ class JobDataAnswers(JobData):
             F.col('lastName').desc(),
             F.col('firstName')
         ).limit(10)
+        df.show(truncate=False, vertical=True)
         result = df.collect()
-        print(result)
         return convert_to_list_of_dict(result)
 
     def answer_11(self):
@@ -141,8 +151,8 @@ class JobDataAnswers(JobData):
         df = self.transform_job_with_max_salary_for_each_profile()
         df = df.select('id', 'profile.*', 'job_max')
         df = df.drop('jobHistory').limit(10)
+        df.show(truncate=False, vertical=True)
         result = df.collect()
-        print(result)
         return convert_to_list_of_dict(result)
 
     def all_answers(self):
@@ -159,5 +169,8 @@ class JobDataAnswers(JobData):
 
 
 if __name__ == '__main__':
-    job = JobDataAnswers('/Users/spsoni/seekanalytics/test_data/part*.json')
-    # job = JobDataAnswers('/Users/spsoni/seekanalytics/test_data/part0.json')
+    PROJECT_DIR = dirname(dirname(abspath(__file__)))
+    DATA = join(PROJECT_DIR, 'test_data', 'part0.json')
+
+    job = JobDataAnswers(DATA)
+    job.all_answers()
