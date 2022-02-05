@@ -1,4 +1,5 @@
 import pytest
+from job_data import collect_and_convert_to_list_of_dict
 from main import JobDataAnswers
 from os.path import dirname, abspath, join
 
@@ -54,7 +55,11 @@ def test_answer5(data_job):
 
 
 def test_answer6(data_job):
-    top5, bottom5 = data_job.answer_6()
+    top5_df, bottom5_df = data_job.answer_6()
+
+    top5 = collect_and_convert_to_list_of_dict(top5_df)
+    bottom5 = collect_and_convert_to_list_of_dict(bottom5_df)
+
     top5_expected = [
         {'title': 'Administration Officer', 'location': 'Hobart', 'average_salary': 148000.0},
         {'title': 'customer service officer', 'location': 'Hobart', 'average_salary': 148000.0},
@@ -105,7 +110,8 @@ def test_answer9(data_job):
 
 
 def test_answer10(data_job):
-    result = data_job.answer_10()
+    df = data_job.answer_10()
+    result = collect_and_convert_to_list_of_dict(df)
     assert len(result) == 10
     result_expected = [
         {'id': 'b9639e56-8ee6-4531-b2e2-a9add5eb67da', 'firstName': 'Stuart', 'lastName': 'Zumwalt',
@@ -118,7 +124,8 @@ def test_answer10(data_job):
 
 
 def test_answer11(data_job):
-    result = data_job.answer_11()
+    df = data_job.answer_11()
+    result = collect_and_convert_to_list_of_dict(df)
     result_expected = [
         {'id': 'e23c7ab2-6479-4014-9baf-15d0e5191dc9', 'firstName': 'Elizabeth', 'lastName': 'Robledo',
          'job_max': {'title': 'middleware specialist', 'location': 'Perth', 'salary': 116000, 'fromDate': '2013-03-13', 'toDate': '2019-02-13'}},

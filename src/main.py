@@ -1,6 +1,6 @@
 from os.path import dirname, abspath, join
 from pyspark.sql import functions as F
-from job_data import JobData, convert_to_list_of_dict
+from job_data import JobData
 
 
 class JobDataAnswers(JobData):
@@ -17,7 +17,7 @@ class JobDataAnswers(JobData):
 
     def answer_4(self):
         print('''4. What is the average salary for each profile? 
-        Display the first 10 results, ordered by lastName in descending order.''')
+   Display the first 10 results, ordered by lastName in descending order.''')
         df = self.transform_averge_salary_for_each_profile()
         df = df.select('id', 'profile.*', 'salary_average')
         df = df.drop('jobHistory')
@@ -39,7 +39,7 @@ class JobDataAnswers(JobData):
 
     def answer_6(self):
         print('''6. On average, what are the top 5 paying jobs? 
-        Bottom 5 paying jobs? If there is a tie, please order by title, location.''')
+   Bottom 5 paying jobs? If there is a tie, please order by title, location.''')
         df = self.transform_extract_all_jobs()
         df = df.groupby(
             'title',
@@ -57,7 +57,6 @@ class JobDataAnswers(JobData):
             ).limit(5)
         )
         data_top_5_df.show(truncate=False)
-        data_top_5 = data_top_5_df.collect()
 
         print('6.2. Bottom 5:')
         data_bottom_5_df = (
@@ -68,20 +67,12 @@ class JobDataAnswers(JobData):
             ).limit(5)
         )
         data_bottom_5_df.show(truncate=False)
-        data_bottom_5 = data_bottom_5_df.collect()
 
-        return (
-            convert_to_list_of_dict(
-                data_top_5
-            ),
-            convert_to_list_of_dict(
-                data_bottom_5
-            )
-        )
+        return data_top_5_df, data_bottom_5_df
 
     def answer_7(self):
         print('''7. Who is currently making the most money? 
-        If there is a tie, please order in lastName descending, fromDate descending.''')
+   If there is a tie, please order in lastName descending, fromDate descending.''')
 
         df = self.transform_extract_all_jobs()
 
@@ -130,8 +121,8 @@ class JobDataAnswers(JobData):
 
     def answer_10(self):
         print('''10. For each person, list only their latest job. 
-        Display the first 10 results, ordered by lastName descending, 
-        firstName ascending order.''')
+    Display the first 10 results, ordered by lastName descending, 
+    firstName ascending order.''')
         df = self.transform_latest_job_for_each_profile()
         df = df.select('id', 'profile.*', 'job_latest')
         df = df.drop('jobHistory')
@@ -140,20 +131,18 @@ class JobDataAnswers(JobData):
             F.col('firstName')
         ).limit(10)
         df.show(truncate=False, vertical=True)
-        result = df.collect()
-        return convert_to_list_of_dict(result)
+        return df
 
     def answer_11(self):
         print('''11. For each person, list their highest paying job along 
-        with their first name, last name, salary and the year they made 
-        this salary. Store the results in a dataframe, and then print 
-        out 10 results''')
+    with their first name, last name, salary and the year they made 
+    this salary. Store the results in a dataframe, and then print 
+    out 10 results''')
         df = self.transform_job_with_max_salary_for_each_profile()
         df = df.select('id', 'profile.*', 'job_max')
         df = df.drop('jobHistory').limit(10)
         df.show(truncate=False, vertical=True)
-        result = df.collect()
-        return convert_to_list_of_dict(result)
+        return df
 
     def all_answers(self):
         self.answer_2()
@@ -170,7 +159,7 @@ class JobDataAnswers(JobData):
 
 if __name__ == '__main__':
     PROJECT_DIR = dirname(dirname(abspath(__file__)))
-    DATA = join(PROJECT_DIR, 'test_data', 'part0.json')
+    DATA = join(PROJECT_DIR, 'test_data', '*.json')
 
     job = JobDataAnswers(DATA)
     job.all_answers()

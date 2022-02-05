@@ -9,6 +9,11 @@ def convert_to_list_of_dict(result):
     return [row.asDict(recursive=True) for row in result]
 
 
+def collect_and_convert_to_list_of_dict(df: DataFrame):
+    result = df.collect()
+    return convert_to_list_of_dict(result)
+
+
 class JobData:
     schema = StructType(fields=[
         StructField('id', StringType(), True),
