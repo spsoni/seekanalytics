@@ -37,7 +37,7 @@ RUN set -ex && \
     echo "spark.hadoop.fs.s3.impl=org.apache.hadoop.fs.s3a.S3AFileSystem" >> $SPARK_HOME/conf/spark-defaults.conf && \
     apt-get remove -y curl bzip2 && \
     apt-get autoremove -y && \
-    apt-get clean \
+    apt-get clean
 
 #
 #ENTRYPOINT ["spark-submit"]
