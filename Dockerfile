@@ -6,9 +6,13 @@ LABEL org.opencontainers.image.title="Apache PySpark $SPARK_VERSION" \
       org.opencontainers.image.version=$SPARK_VERSION
 
 COPY . /job
+WORKDIR /job
 
 ENV PATH="/opt/miniconda3/bin:${PATH}"
 ENV PYSPARK_PYTHON="/opt/miniconda3/bin/python"
+ENV PYTHONPATH="/job/seekanalytics:${PYTHONPATH}"
+ENV DATADIR="/job/test_data"
+ENV FILEFORMAT="json"
 
 RUN set -ex && \
 	apt-get update && \
@@ -23,7 +27,7 @@ RUN set -ex && \
     conda clean -tipy && \
     echo "PATH=/opt/miniconda3/bin:\${PATH}" > /etc/profile.d/miniconda.sh && \
     pip install --no-cache pyspark[$SPARK_EXTRAS]==${SPARK_VERSION} && \
-    pip install pytest pytest-xdist && \
+    pip install -r /job/requirements.txt && \
     SPARK_HOME=$(python /opt/miniconda3/bin/find_spark_home.py) && \
     echo "export SPARK_HOME=$(python /opt/miniconda3/bin/find_spark_home.py)" > /etc/profile.d/spark.sh && \
     curl -s -L --url "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar" --output $SPARK_HOME/jars/aws-java-sdk-1.7.4.jar && \
@@ -33,7 +37,8 @@ RUN set -ex && \
     echo "spark.hadoop.fs.s3.impl=org.apache.hadoop.fs.s3a.S3AFileSystem" >> $SPARK_HOME/conf/spark-defaults.conf && \
     apt-get remove -y curl bzip2 && \
     apt-get autoremove -y && \
-    apt-get clean
+    apt-get clean \
 
-ENTRYPOINT ["spark-submit"]
-CMD ["--help"]
+#
+#ENTRYPOINT ["spark-submit"]
+#CMD ["--help"]
