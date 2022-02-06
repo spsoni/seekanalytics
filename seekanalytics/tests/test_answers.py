@@ -148,7 +148,7 @@ def test_answer11(data_job):
 def test_answer12(data_job, tmp_path):
     df = data_job.answer_12(str(tmp_path))
     result = collect_and_convert_to_list_of_dict(df)
-    assert len(result) == 21
+    assert len(result) == 20
     result_expected = [{
         'firstName': 'Denise',
         'id': '8681aa39-652c-4661-aa21-9a60f1985226',
