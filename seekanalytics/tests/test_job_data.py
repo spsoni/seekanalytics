@@ -1,7 +1,8 @@
-import pytest
-from job_data import JobData, DataFrame, convert_to_list_of_dict, F
 from os.path import dirname, abspath, join
 
+import pytest
+
+from job_data import JobData, DataFrame, convert_to_list_of_dict, F
 
 PROJECT_DIR = dirname(dirname(abspath(__file__)))
 TEST_DATA = join(PROJECT_DIR, 'data')

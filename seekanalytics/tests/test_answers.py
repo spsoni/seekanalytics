@@ -1,8 +1,9 @@
-import pytest
-from job_data import collect_and_convert_to_list_of_dict
-from main import JobDataAnswers
 from os.path import dirname, abspath, join
 
+import pytest
+
+from job_data import collect_and_convert_to_list_of_dict
+from main import JobDataAnswers
 
 PROJECT_DIR = dirname(dirname(abspath(__file__)))
 TEST_DATA = join(PROJECT_DIR, 'data')

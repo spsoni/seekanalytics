@@ -1,7 +1,7 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.types import *
-from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.types import *
 
 
 def convert_to_list_of_dict(result):
@@ -38,17 +38,38 @@ class JobData:
     def __init__(self, path, data_format: str = 'json'):
         self.path = path
         self.data_format = data_format
-        self.spark = SparkSession.builder.getOrCreate()
-        self.spark.sparkContext.setLogLevel("OFF")
+        self.spark = SparkSession.builder.appName('sury-seek').getOrCreate()
+        self.spark.sparkContext.setLogLevel('OFF')
         self._df: DataFrame = None
+        self._df_jobs: DataFrame = None
 
     @property
     def df(self) -> DataFrame:
         # loading dataset on first use of self.df
         if self._df is None:
             self._df = self.spark.read.load(self.path, format=self.data_format, schema=self.schema)
+            # self._df.checkpoint(eager=True)
 
         return self._df
+
+    @property
+    def df_jobs(self) -> DataFrame:
+        if self._df_jobs is None:
+            self._df_jobs = self.df.select(
+                'id',
+                'profile.firstName',
+                'profile.lastName',
+                F.explode('profile.jobHistory').alias('job')
+            ).select(
+                'id',
+                'firstName',
+                'lastName',
+                'job.*',
+                F.substring('job.fromDate', 1, 4).alias('from_year')
+            )
+            # self._df_jobs.cache()
+
+        return self._df_jobs
 
     def transform_averge_salary_for_each_profile(self, df: DataFrame = None) -> DataFrame:
         if df is None:
@@ -141,18 +162,19 @@ class JobData:
         return df
 
     def transform_extract_all_jobs(self, df: DataFrame = None) -> DataFrame:
-        if df is None:
-            df = self.df
-
-        return df.select(
-            'id',
-            'profile.firstName',
-            'profile.lastName',
-            F.explode('profile.jobHistory').alias('job')
-        ).select(
-            'id',
-            'firstName',
-            'lastName',
-            'job.*',
-            F.substring('job.fromDate', 1, 4).alias('from_year')
-        )
+        # if df is None:
+        #     df = self.df
+        #
+        # return df.select(
+        #     'id',
+        #     'profile.firstName',
+        #     'profile.lastName',
+        #     F.explode('profile.jobHistory').alias('job')
+        # ).select(
+        #     'id',
+        #     'firstName',
+        #     'lastName',
+        #     'job.*',
+        #     F.substring('job.fromDate', 1, 4).alias('from_year')
+        # )
+        return self.df_jobs

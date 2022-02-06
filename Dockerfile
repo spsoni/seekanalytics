@@ -1,9 +1,11 @@
 FROM openjdk:11-jre-slim
-MAINTAINER="Reference - https://github.com/godatadriven-dockerhub/pyspark"
+MAINTAINER "Reference - https://github.com/godatadriven-dockerhub/pyspark"
 ARG SPARK_VERSION=3.2.1
 
 LABEL org.opencontainers.image.title="Apache PySpark $SPARK_VERSION" \
       org.opencontainers.image.version=$SPARK_VERSION
+
+COPY . /job
 
 ENV PATH="/opt/miniconda3/bin:${PATH}"
 ENV PYSPARK_PYTHON="/opt/miniconda3/bin/python"

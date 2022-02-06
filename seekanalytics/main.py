@@ -1,5 +1,7 @@
 from os.path import dirname, abspath, join
+
 from pyspark.sql import functions as F
+
 from job_data import JobData
 
 
@@ -18,6 +20,7 @@ class JobDataAnswers(JobData):
     def answer_4(self):
         print('''4. What is the average salary for each profile? 
    Display the first 10 results, ordered by lastName in descending order.''')
+
         df = self.transform_averge_salary_for_each_profile()
         df = df.select('id', 'profile.*', 'salary_average')
         df = df.drop('jobHistory')
@@ -157,9 +160,14 @@ class JobDataAnswers(JobData):
         self.answer_11()
 
 
-if __name__ == '__main__':
+def main():
+    # TODO: take optparse parameters for test data and its format
     PROJECT_DIR = dirname(dirname(abspath(__file__)))
     DATA = join(PROJECT_DIR, 'test_data', '*.json')
 
-    job = JobDataAnswers(DATA)
+    job = JobDataAnswers(DATA, data_format='json')
     job.all_answers()
+
+
+if __name__ == '__main__':
+    main()
