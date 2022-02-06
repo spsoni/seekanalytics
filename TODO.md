@@ -3,7 +3,6 @@ Lots of potential improvements can be done in this code.
 
 ## Enhancements
 - Improved (future-proof) Dockerfile with parameters for Java and PySpark versions
-- Makefile for most of the common activities like build, test and run
 - CLI parameters and environment variable based generalisation for any assumptions made in this code
 - Exception handling for any bad data record or files
 - Spark Configuration fine-tuning according to the dataset
