@@ -2,7 +2,6 @@
 Main module to answer the quest
 """
 import os
-import shutil
 from os.path import (
     abspath,
     dirname,
@@ -167,7 +166,6 @@ class JobDataAnswers(JobData):
         df = df.drop('jobHistory')
         df = df.orderBy('max_salary_year', 'firstName', 'lastName')
 
-        # shutil.rmtree(output_path, ignore_errors=True)
         # actual write here
         (
             df.write
@@ -175,11 +173,15 @@ class JobDataAnswers(JobData):
             .partitionBy('max_salary_year')
             .parquet(output_path, compression='snappy')
         )
-        df_new = self.spark.read.schema(df.schema).parquet(output_path)
-        df_new = df_new.orderBy('max_salary_year', 'firstName', 'lastName')
-        return df_new
+        df_parquet = self.spark.read.schema(df.schema).parquet(output_path)
+        return df_parquet.orderBy('max_salary_year', 'firstName', 'lastName')
 
-    def all_answers(self, output_path):
+    def all_answers(self, output_path) -> None:
+        """
+        Combine all answer functions here
+        :param output_path: path to store parquet output
+        :return: None
+        """
         self.answer_2()
         self.answer_3()
         self.answer_4()
@@ -213,6 +215,7 @@ def main():
         'FILEFORMAT',
         'json'
     )
+    # TODO: remove the need to explictly provide *.file_format here
     data_path = join(data_dir, f'*.{file_format}')
 
     job = JobDataAnswers(data_path, file_format=file_format)
