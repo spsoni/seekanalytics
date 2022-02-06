@@ -131,11 +131,43 @@ def test_answer11(data_job):
     result = collect_and_convert_to_list_of_dict(df)
     result_expected = [
         {'id': 'e23c7ab2-6479-4014-9baf-15d0e5191dc9', 'firstName': 'Elizabeth', 'lastName': 'Robledo',
-         'job_max': {'title': 'middleware specialist', 'location': 'Perth', 'salary': 116000, 'fromDate': '2013-03-13', 'toDate': '2019-02-13'}},
+         'job_max': {'title': 'middleware specialist', 'location': 'Perth', 'salary': 116000, 'fromDate': '2013-03-13', 'toDate': '2019-02-13'},
+         'max_salary': 116000,
+         'max_salary_year': '2013'},
         {'id': 'f331d115-95a5-4a14-845b-a052bcd71c4c', 'firstName': 'Ferne', 'lastName': 'Ott',
-         'job_max': {'title': 'middleware specialist', 'location': 'Hobart', 'salary': 69000, 'fromDate': '2014-04-13', 'toDate': '2019-03-13'}}
+         'job_max': {'title': 'middleware specialist', 'location': 'Hobart', 'salary': 69000, 'fromDate': '2014-04-13', 'toDate': '2019-03-13'},
+         'max_salary': 69000,
+         'max_salary_year': '2014'}
     ]
 
     assert len(result) == 10
+    assert result[0] == result_expected[0]
+    assert result[-1] == result_expected[-1]
+
+
+def test_answer12(data_job, tmp_path):
+    df = data_job.answer_12(str(tmp_path))
+    result = collect_and_convert_to_list_of_dict(df)
+    assert len(result) == 20
+    result_expected = [{
+        'firstName': 'Denise',
+        'id': '8681aa39-652c-4661-aa21-9a60f1985226',
+        'job_max': None,
+        'lastName': 'Barnes',
+        'max_salary': None,
+        'max_salary_year': None
+    }, {
+        'firstName': 'Stuart',
+        'id': 'b9639e56-8ee6-4531-b2e2-a9add5eb67da',
+        'job_max': {'fromDate': '2019-03-23',
+                    'location': 'Perth',
+                    'salary': 86000,
+                    'title': 'technician',
+                    'toDate': None},
+        'lastName': 'Zumwalt',
+        'max_salary': 86000,
+        'max_salary_year': '2019'
+    }]
+
     assert result[0] == result_expected[0]
     assert result[-1] == result_expected[-1]

@@ -11,8 +11,9 @@ WORKDIR /job
 ENV PATH="/opt/miniconda3/bin:${PATH}"
 ENV PYSPARK_PYTHON="/opt/miniconda3/bin/python"
 ENV PYTHONPATH="/job/seekanalytics:${PYTHONPATH}"
-ENV DATADIR="/job/test_data"
+ENV DATADIR="/job/input"
 ENV FILEFORMAT="json"
+ENV OUTPUTDIR="/job/output"
 
 RUN set -ex && \
 	apt-get update && \

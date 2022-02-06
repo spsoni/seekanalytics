@@ -1,23 +1,45 @@
+"""
+module to hold generic job data analytics related class and code
+"""
 from pyspark.sql import (
     DataFrame,
     Row,
     SparkSession,
     functions as F
 )
-from pyspark.sql.types import *
+from pyspark.sql.types import (
+    ArrayType,
+    IntegerType,
+    StructType,
+    StringType,
+    StructField
+)
 
 
 def convert_to_list_of_dict(result: list[Row]) -> list:
-    # convert to list of dictionary for unit testing convenience
+    """
+    convert to list of dictionary for unit testing convenience
+
+    :param result: list of Row objects from df.collect()
+    :return: list of dictionary objects
+    """
     return [row.asDict(recursive=True) for row in result]
 
 
 def collect_and_convert_to_list_of_dict(df: DataFrame) -> list:
+    """
+    collect and transform list of Row objects to list of dictionary objects
+    :param df: transformed dataframe object ready to be collected
+    :return: list of dictionary objects
+    """
     result = df.collect()
     return convert_to_list_of_dict(result)
 
 
 class JobData:
+    """
+    Base class to handle Job Data extract and transformations
+    """
     schema = StructType(fields=[
         StructField('id', StringType(), True),
         StructField(
@@ -39,6 +61,11 @@ class JobData:
     ])
 
     def __init__(self, path: str, file_format: str = 'json') -> None:
+        """
+        Job data initialisation for extract and transform
+        :param path: data directory / file pattern
+        :param file_format: for spark.read.load format parameter
+        """
         self.path = path
         self.file_format = file_format
         self.spark = SparkSession.builder.appName('sury-seek').getOrCreate()
@@ -61,6 +88,11 @@ class JobData:
     def transform_averge_salary_for_each_profile(
             self,
             df: DataFrame = None) -> DataFrame:
+        """
+        transform dataframe to include average salary column
+        :param df: override dataframe object, defaults to self.df
+        :return: transformed dataframe
+        """
         if df is None:
             df = self.df
 
@@ -101,27 +133,43 @@ class JobData:
     def transform_job_with_max_salary_for_each_profile(
             self,
             df: DataFrame = None) -> DataFrame:
+        """
+        transform function to include job history object with maximum salary for each profile
+        :param df: override dataframe object, defaults to self.df
+        :return: transformed dataframe
+        """
         if df is None:
             df = self.df
 
+        init_acc = F.struct(
+            F.lit(None).cast('string').alias('title'),
+            F.lit(None).cast('string').alias('location'),
+            F.lit(None).cast('integer').alias('salary'),
+            F.lit(None).cast('string').alias('fromDate'),
+            F.lit(None).cast('string').alias('toDate')
+        )
         df = df.withColumn(
             'job_max',
             F.aggregate(
                 'profile.jobHistory',
-                F.struct(
-                    F.lit('').alias('title'),
-                    F.lit('').alias('location'),
-                    F.lit(0).alias('salary'),
-                    F.lit('').alias('fromDate'),
-                    F.lit('').alias('toDate')
-                ),
+                init_acc,
                 lambda acc, x: F.when(
-                    (x['salary'] >= acc.salary) & (x['fromDate'] >= acc.fromDate),
+                    (F.isnull(acc.salary)) | (x['salary'] >= acc.salary) & (x['fromDate'] >= acc.fromDate),
                     x
                 ).otherwise(
                     acc
-                )
-            )
+                ),
+                lambda x: F.when(x == init_acc, None).otherwise(x)
+            ),
+        )
+        df = df.select(
+            'id',
+            'profile.*',
+            'job_max',
+            F.col('job_max.salary').alias('max_salary'),
+            F.when(F.col('job_max.fromDate') == '', 'NA').otherwise(
+                F.substring('job_max.fromDate', 1, 4)
+            ).alias('max_salary_year')
         )
 
         return df
@@ -129,6 +177,11 @@ class JobData:
     def transform_latest_job_for_each_profile(
             self,
             df: DataFrame = None) -> DataFrame:
+        """
+        transform function to add latest job as an additional column from the job history list
+        :param df: override dataframe object, defaults to self.df
+        :return: transformed dataframe
+        """
         if df is None:
             df = self.df
 
@@ -157,6 +210,11 @@ class JobData:
     def transform_extract_all_jobs(
             self,
             df: DataFrame = None) -> DataFrame:
+        """
+        transform function to explode job history into multiple rows for each profile
+        :param df: override dataframe object, defaults to self.df
+        :return: transformed dataframe
+        """
         if df is None:
             df = self.df
 

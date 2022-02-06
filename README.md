@@ -24,10 +24,11 @@ make test
 ```
 
 ## Run
-Replace $(pwd) with data directory to mount the actual large json file folder path for analytics
+Please set environment variable DATADIR for input files.
+And, set environment variable OUTPUTDIR for parquet output.
 
 ```shell
-docker run --rm -p 4040:4040 -v $(pwd):/job/test_data seekanalytics:1.0.0 /job/spark-submit.sh
+docker run --rm -p 4040:4040 -v $(OUTPUTDIR):/job/output -v $(DATADIR):/job/input seekanalytics:1.0.0 /job/spark-submit.sh
 ```
 or on linux like environment
 ```shell
@@ -174,58 +175,6 @@ root
  lastName   | Zywicki
  job_latest | {trimmer, Perth, 66000, 2017-06-01, 2019-04-01}
 
-11. For each person, list their highest paying job along
-    with their first name, last name, salary and the year they made
-    this salary. Store the results in a dataframe, and then print
-    out 10 results
--RECORD 0----------------------------------------------------------------------------
- id        | e23c7ab2-6479-4014-9baf-15d0e5191dc9
- firstName | Elizabeth
- lastName  | Robledo
- job_max   | {middleware specialist, Perth, 116000, 2013-03-13, 2019-02-13}
--RECORD 1----------------------------------------------------------------------------
- id        | a4c6238d-0aed-4eb8-b60c-242983e43edb
- firstName | Karen
- lastName  | Bozek
- job_max   | {sales representative, Hobart, 148000, 2013-10-12, 2019-04-12}
--RECORD 2----------------------------------------------------------------------------
- id        | dcbae85f-4971-4fdc-a8a9-dacd7fde49fc
- firstName | Lisa
- lastName  | Grell
- job_max   | {procurement specialist, Brisbane, 131000, 2015-07-14, 2019-04-14}
--RECORD 3----------------------------------------------------------------------------
- id        | 918d0a79-209e-4170-9818-3b5ef0134cee
- firstName | Virginia
- lastName  | Rodriguez
- job_max   | {Support Analyst, Brisbane, 95000, 2018-05-17, 2019-01-17}
--RECORD 4----------------------------------------------------------------------------
- id        | 915730cc-3947-4b00-a80b-091f912350b1
- firstName | Barbara
- lastName  | Jochem
- job_max   | {hr advisor, Hobart, 66000, 2015-07-14, 2019-01-14}
--RECORD 5----------------------------------------------------------------------------
- id        | adbc3999-a4c9-4e49-9378-74732f54ddd6
- firstName | Justin
- lastName  | Osborne
- job_max   | {Warehouse Storeperson, Melbourne, 109000, 2014-10-23, null}
--RECORD 6----------------------------------------------------------------------------
- id        | 41a6f59c-345e-445c-ae04-599db08731db
- firstName | William
- lastName  | Avalos
- job_max   | {customer service officer, Brisbane, 124000, 2017-01-23, null}
--RECORD 7----------------------------------------------------------------------------
- id        | 4afa1335-b671-45c7-9e0d-257b915690e5
- firstName | George
- lastName  | Barone
- job_max   | {medical radiation technologist, Sydney, 75000, 2016-10-09, 2019-04-09}
--RECORD 8----------------------------------------------------------------------------
- id        | dbf4c94f-a5ab-4661-a5ce-1928d9dccd9c
- firstName | Martha
- lastName  | Noel
- job_max   | {corporate consultant, Adelaide, 73000, 2017-03-23, null}
--RECORD 9----------------------------------------------------------------------------
- id        | f331d115-95a5-4a14-845b-a052bcd71c4c
- firstName | Ferne
- lastName  | Ott
- job_max   | {middleware specialist, Hobart, 69000, 2014-04-13, 2019-03-13}
+
+Question 11 and 12 output is not present here
 ```

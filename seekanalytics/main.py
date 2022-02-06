@@ -1,4 +1,8 @@
+"""
+Main module to answer the quest
+"""
 import os
+import shutil
 from os.path import (
     abspath,
     dirname,
@@ -14,6 +18,10 @@ from job_data import JobData
 
 
 class JobDataAnswers(JobData):
+    """
+    subclass of JobData for keeping the answer functions decoupled
+    from base transform functions
+    """
     def answer_2(self) -> StructType:
         print('2. Print the schema')
         self.df.printSchema()
@@ -148,12 +156,30 @@ class JobDataAnswers(JobData):
     this salary. Store the results in a dataframe, and then print 
     out 10 results''')
         df = self.transform_job_with_max_salary_for_each_profile()
-        df = df.select('id', 'profile.*', 'job_max')
         df = df.drop('jobHistory').limit(10)
         df.show(truncate=False, vertical=True)
         return df
 
-    def all_answers(self):
+    def answer_12(self, output_path: str) -> DataFrame:
+        print('''12. Write out the last result (question 11) in parquet format, 
+    compressed, partitioned by year of their highest paying job''')
+        df = self.transform_job_with_max_salary_for_each_profile()
+        df = df.drop('jobHistory')
+        df = df.orderBy('max_salary_year', 'firstName', 'lastName')
+
+        # shutil.rmtree(output_path, ignore_errors=True)
+        # actual write here
+        (
+            df.write
+            .mode('overwrite')
+            .partitionBy('max_salary_year')
+            .parquet(output_path, compression='snappy')
+        )
+        df_new = self.spark.read.schema(df.schema).parquet(output_path)
+        df_new = df_new.orderBy('max_salary_year', 'firstName', 'lastName')
+        return df_new
+
+    def all_answers(self, output_path):
         self.answer_2()
         self.answer_3()
         self.answer_4()
@@ -164,25 +190,33 @@ class JobDataAnswers(JobData):
         self.answer_9()
         self.answer_10()
         self.answer_11()
+        self.answer_12(output_path)
 
 
 def main():
     # TODO: take optparse parameters for test data and its format
-    DATADIR = os.environ.get(
+    data_dir = os.environ.get(
         'DATADIR',
         join(
             dirname(dirname(abspath(__file__))),
-            'test_data'
+            'input'
         )
     )
-    FILEFORMAT = os.environ.get(
+    output_dir = os.environ.get(
+        'OUTPUTDIR',
+        join(
+            dirname(dirname(abspath(__file__))),
+            'output'
+        )
+    )
+    file_format = os.environ.get(
         'FILEFORMAT',
         'json'
     )
-    DATAPATH = join(DATADIR, f'*.{FILEFORMAT}')
+    data_path = join(data_dir, f'*.{file_format}')
 
-    job = JobDataAnswers(DATAPATH, file_format=FILEFORMAT)
-    job.all_answers()
+    job = JobDataAnswers(data_path, file_format=file_format)
+    job.all_answers(output_dir)
 
 
 if __name__ == '__main__':

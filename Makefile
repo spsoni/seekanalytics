@@ -1,5 +1,3 @@
-DATADIR="${DATADIR:-$PWD}"
-FILEFORMAT="${FILEFORMAT:-json}"
 VERSION="1.0.0"
 
 build:
@@ -8,6 +6,17 @@ build:
 test:
 	docker run --rm seekanalytics:$(VERSION) pytest -v -x
 
-run:
-	docker run --rm -p 4040:4040 -v $(DATADIR):/job/test_data \
+check-env-input:
+ifndef DATADIR
+	$(error Please set environment variable DATADIR for input files)
+endif
+
+
+check-env-output:
+ifndef OUTPUTDIR
+	$(error Please set environment variable OUTPUTDIR for parquet output)
+endif
+
+run: check-env-output check-env-input
+	docker run --rm -p 4040:4040 -v $(OUTPUTDIR):/job/output -v $(DATADIR):/job/input \
 		seekanalytics:$(VERSION) /job/spark-submit.sh
