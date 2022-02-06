@@ -7,7 +7,7 @@ Detailed TODO.md is maintained in this repository.
 ## Build
 ### Docker image build:
 ```shell
-docker build -t pyspark:latest .
+docker build -t seekanalytics:latest .
 ```
 
 ### python module install:
@@ -19,12 +19,14 @@ pip install --editable .
 
 ## Test
 ```shell
-docker run --rm -p 4040:4040 -v $(pwd):/job pyspark:latest spark-submit --py-files /job/src/job_data.py /job/src/main.py
+docker run --rm seekanalytics:latest pytest -v -x
 ```
 
 ## Run
+Replace $(pwd) with data directory to mount the actual large file folder path for analytics
+
 ```shell
-docker run --rm -p 4040:4040 -v $(pwd):/job pyspark:latest spark-submit --py-files /job/src/job_data.py /job/src/main.py
+docker run --rm -p 4040:4040 -v $(pwd):/job/test_data seekanalytics:latest spark-submit --py-files /job/seekanalytics/job_data.py /job/seekanalytics/main.py
 ```
 
 ## Sample Output
