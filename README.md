@@ -9,10 +9,18 @@ Detailed TODO.md is maintained in this repository.
 ```shell
 docker build -t seekanalytics:1.0.0 .
 ```
+or on linux like environment
+```shell
+make build
+```
 
 ## Test
 ```shell
 docker run --rm seekanalytics:1.0.0 pytest -v -x
+```
+or on linux like environment
+```shell
+make test
 ```
 
 ## Run
@@ -20,6 +28,10 @@ Replace $(pwd) with data directory to mount the actual large json file folder pa
 
 ```shell
 docker run --rm -p 4040:4040 -v $(pwd):/job/test_data seekanalytics:1.0.0 /job/spark-submit.sh
+```
+or on linux like environment
+```shell
+make run
 ```
 
 ## Sample Output
