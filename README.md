@@ -7,26 +7,19 @@ Detailed TODO.md is maintained in this repository.
 ## Build
 ### Docker image build:
 ```shell
-docker build -t seekanalytics:latest .
-```
-
-### python module install:
-
-#### Editable version
-```shell
-pip install --editable .
+docker build -t seekanalytics:1.0.0 .
 ```
 
 ## Test
 ```shell
-docker run --rm seekanalytics:latest pytest -v -x
+docker run --rm seekanalytics:1.0.0 pytest -v -x
 ```
 
 ## Run
 Replace $(pwd) with data directory to mount the actual large file folder path for analytics
 
 ```shell
-docker run --rm -p 4040:4040 -v $(pwd):/job/test_data seekanalytics:latest spark-submit --py-files /job/seekanalytics/job_data.py /job/seekanalytics/main.py
+docker run --rm -p 4040:4040 -v $(pwd):/job/test_data seekanalytics:1.0.0 spark-submit --py-files /job/seekanalytics/job_data.py /job/seekanalytics/main.py
 ```
 
 ## Sample Output
