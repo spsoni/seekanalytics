@@ -7,7 +7,6 @@ Lots of potential improvements can be done in this code.
 - Exception handling for any bad data record or files
 - Spark Configuration fine-tuning according to the dataset
 - parameterised pytests for more comprehensive testing with multiple test data files
-- CI/CD action script for automatic Docker build
 - No data quality checks are in place in current code, e.g. if fromDate is missing or NULL
 - No unicode data validatation so far
 - This solution is purely for academic purpose. In production environment, in ETL pipelines we would create intermediate datasets for read performance (parquet) for regular average / min / max calculations on salaries. Basically current data can be exploded (de-normalised) and stored in parquet format for efficient data analytics
