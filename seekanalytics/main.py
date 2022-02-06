@@ -1,23 +1,30 @@
-from os.path import dirname, abspath, join
-
-from pyspark.sql import functions as F
+from os.path import (
+    abspath,
+    dirname,
+    join
+)
+from pyspark.sql import (
+    DataFrame,
+    functions as F
+)
+from pyspark.sql.types import StructType
 
 from job_data import JobData
 
 
 class JobDataAnswers(JobData):
-    def answer_2(self):
+    def answer_2(self) -> StructType:
         print('2. Print the schema')
         self.df.printSchema()
         return self.df.schema
 
-    def answer_3(self):
+    def answer_3(self) -> int:
         print('3. How many records are there in the dataset?')
         records = self.df.count()
         print(records)
         return records
 
-    def answer_4(self):
+    def answer_4(self) -> DataFrame:
         print('''4. What is the average salary for each profile? 
    Display the first 10 results, ordered by lastName in descending order.''')
 
@@ -30,7 +37,7 @@ class JobDataAnswers(JobData):
         df.show(truncate=False)
         return df
 
-    def answer_5(self):
+    def answer_5(self) -> int:
         print('5. What is the average salary across the whole dataset?')
         df = self.transform_extract_all_jobs()
         df = df.select(
@@ -40,7 +47,7 @@ class JobDataAnswers(JobData):
         print(data['average_salary_for_entire_dataset'])
         return data['average_salary_for_entire_dataset']
 
-    def answer_6(self):
+    def answer_6(self) -> tuple:
         print('''6. On average, what are the top 5 paying jobs? 
    Bottom 5 paying jobs? If there is a tie, please order by title, location.''')
         df = self.transform_extract_all_jobs()
@@ -73,7 +80,7 @@ class JobDataAnswers(JobData):
 
         return data_top_5_df, data_bottom_5_df
 
-    def answer_7(self):
+    def answer_7(self) -> DataFrame:
         print('''7. Who is currently making the most money? 
    If there is a tie, please order in lastName descending, fromDate descending.''')
 
@@ -88,10 +95,9 @@ class JobDataAnswers(JobData):
             F.col('fromDate').desc()
         ).limit(1)
         df.show(truncate=False, vertical=True)
-        result = df.collect()[0]
-        return result.asDict()
+        return df
 
-    def answer_8(self):
+    def answer_8(self) -> DataFrame:
         print('''8. What was the most popular job title started in 2019?''')
 
         df = self.transform_extract_all_jobs()
@@ -109,10 +115,9 @@ class JobDataAnswers(JobData):
             F.col('average_salary').desc()
         ).limit(1)
         df.show(truncate=False)
-        result = df.collect()[0]
-        return result.asDict()
+        return df
 
-    def answer_9(self):
+    def answer_9(self) -> int:
         print('''9. How many people are currently working?''')
         df = self.transform_extract_all_jobs()
 
@@ -122,7 +127,7 @@ class JobDataAnswers(JobData):
         print(records)
         return records
 
-    def answer_10(self):
+    def answer_10(self) -> DataFrame:
         print('''10. For each person, list only their latest job. 
     Display the first 10 results, ordered by lastName descending, 
     firstName ascending order.''')
@@ -136,7 +141,7 @@ class JobDataAnswers(JobData):
         df.show(truncate=False, vertical=True)
         return df
 
-    def answer_11(self):
+    def answer_11(self) -> DataFrame:
         print('''11. For each person, list their highest paying job along 
     with their first name, last name, salary and the year they made 
     this salary. Store the results in a dataframe, and then print 

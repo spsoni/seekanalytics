@@ -1,15 +1,18 @@
-from pyspark.sql import DataFrame
-from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
+from pyspark.sql import (
+    DataFrame,
+    Row,
+    SparkSession,
+    functions as F
+)
 from pyspark.sql.types import *
 
 
-def convert_to_list_of_dict(result):
+def convert_to_list_of_dict(result: list[Row]) -> list:
     # convert to list of dictionary for unit testing convenience
     return [row.asDict(recursive=True) for row in result]
 
 
-def collect_and_convert_to_list_of_dict(df: DataFrame):
+def collect_and_convert_to_list_of_dict(df: DataFrame) -> list:
     result = df.collect()
     return convert_to_list_of_dict(result)
 
@@ -35,7 +38,7 @@ class JobData:
         )
     ])
 
-    def __init__(self, path, data_format: str = 'json'):
+    def __init__(self, path: str, data_format: str = 'json') -> None:
         self.path = path
         self.data_format = data_format
         self.spark = SparkSession.builder.appName('sury-seek').getOrCreate()
@@ -48,30 +51,12 @@ class JobData:
         # loading dataset on first use of self.df
         if self._df is None:
             self._df = self.spark.read.load(self.path, format=self.data_format, schema=self.schema)
-            # self._df.checkpoint(eager=True)
 
         return self._df
 
-    @property
-    def df_jobs(self) -> DataFrame:
-        if self._df_jobs is None:
-            self._df_jobs = self.df.select(
-                'id',
-                'profile.firstName',
-                'profile.lastName',
-                F.explode('profile.jobHistory').alias('job')
-            ).select(
-                'id',
-                'firstName',
-                'lastName',
-                'job.*',
-                F.substring('job.fromDate', 1, 4).alias('from_year')
-            )
-            # self._df_jobs.cache()
-
-        return self._df_jobs
-
-    def transform_averge_salary_for_each_profile(self, df: DataFrame = None) -> DataFrame:
+    def transform_averge_salary_for_each_profile(
+            self,
+            df: DataFrame = None) -> DataFrame:
         if df is None:
             df = self.df
 
@@ -109,7 +94,9 @@ class JobData:
 
         return df
 
-    def transform_job_with_max_salary_for_each_profile(self, df: DataFrame = None) -> DataFrame:
+    def transform_job_with_max_salary_for_each_profile(
+            self,
+            df: DataFrame = None) -> DataFrame:
         if df is None:
             df = self.df
 
@@ -135,7 +122,9 @@ class JobData:
 
         return df
 
-    def transform_latest_job_for_each_profile(self, df: DataFrame = None) -> DataFrame:
+    def transform_latest_job_for_each_profile(
+            self,
+            df: DataFrame = None) -> DataFrame:
         if df is None:
             df = self.df
 
@@ -161,20 +150,24 @@ class JobData:
 
         return df
 
-    def transform_extract_all_jobs(self, df: DataFrame = None) -> DataFrame:
-        # if df is None:
-        #     df = self.df
-        #
-        # return df.select(
-        #     'id',
-        #     'profile.firstName',
-        #     'profile.lastName',
-        #     F.explode('profile.jobHistory').alias('job')
-        # ).select(
-        #     'id',
-        #     'firstName',
-        #     'lastName',
-        #     'job.*',
-        #     F.substring('job.fromDate', 1, 4).alias('from_year')
-        # )
-        return self.df_jobs
+    def transform_extract_all_jobs(
+            self,
+            df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+
+        if self._df_jobs is None:
+            self._df_jobs = df.select(
+                'id',
+                'profile.firstName',
+                'profile.lastName',
+                F.explode('profile.jobHistory').alias('job')
+            ).select(
+                'id',
+                'firstName',
+                'lastName',
+                'job.*',
+                F.substring('job.fromDate', 1, 4).alias('from_year')
+            )
+
+        return self._df_jobs

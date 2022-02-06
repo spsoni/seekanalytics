@@ -83,7 +83,8 @@ def test_answer6(data_job):
 
 
 def test_answer7(data_job):
-    result = data_job.answer_7()
+    df = data_job.answer_7()
+    result = collect_and_convert_to_list_of_dict(df)[0]
     result_expected = {
         'id': '41a6f59c-345e-445c-ae04-599db08731db',
         'firstName': 'William',
@@ -99,7 +100,8 @@ def test_answer7(data_job):
 
 
 def test_answer8(data_job):
-    result = data_job.answer_8()
+    df = data_job.answer_8()
+    result = collect_and_convert_to_list_of_dict(df)[0]
     result_expected = {'title': 'technician', 'jobs_count': 1, 'average_salary': 86000.0}
     assert result == result_expected
 
