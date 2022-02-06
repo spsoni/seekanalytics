@@ -38,9 +38,9 @@ class JobData:
         )
     ])
 
-    def __init__(self, path: str, data_format: str = 'json') -> None:
+    def __init__(self, path: str, file_format: str = 'json') -> None:
         self.path = path
-        self.data_format = data_format
+        self.file_format = file_format
         self.spark = SparkSession.builder.appName('sury-seek').getOrCreate()
         self.spark.sparkContext.setLogLevel('OFF')
         self._df: DataFrame = None
@@ -50,7 +50,11 @@ class JobData:
     def df(self) -> DataFrame:
         # loading dataset on first use of self.df
         if self._df is None:
-            self._df = self.spark.read.load(self.path, format=self.data_format, schema=self.schema)
+            self._df = self.spark.read.load(
+                self.path,
+                format=self.file_format,
+                schema=self.schema
+            )
 
         return self._df
 

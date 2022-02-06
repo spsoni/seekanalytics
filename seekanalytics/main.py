@@ -1,3 +1,4 @@
+import os
 from os.path import (
     abspath,
     dirname,
@@ -167,10 +168,20 @@ class JobDataAnswers(JobData):
 
 def main():
     # TODO: take optparse parameters for test data and its format
-    PROJECT_DIR = dirname(dirname(abspath(__file__)))
-    DATA = join(PROJECT_DIR, 'test_data', '*.json')
+    DATADIR = os.environ.get(
+        'DATADIR',
+        join(
+            dirname(dirname(abspath(__file__))),
+            'test_data'
+        )
+    )
+    FILEFORMAT = os.environ.get(
+        'FILEFORMAT',
+        'json'
+    )
+    DATAPATH = join(DATADIR, f'*.{FILEFORMAT}')
 
-    job = JobDataAnswers(DATA, data_format='json')
+    job = JobDataAnswers(DATAPATH, file_format=FILEFORMAT)
     job.all_answers()
 
 

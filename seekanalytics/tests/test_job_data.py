@@ -10,7 +10,7 @@ TEST_DATA = join(PROJECT_DIR, 'data')
 
 @pytest.fixture
 def data_job():
-    return JobData(path=TEST_DATA)
+    return JobData(path=TEST_DATA, file_format='json')
 
 
 def test_init(data_job):
