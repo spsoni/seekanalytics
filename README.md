@@ -34,7 +34,7 @@ or on linux like environment
 make run
 ```
 
-## Sample Output
+## Sample Run Output
 ```shell
 # Full output took 7 mins on MBP 32 GB Ram 2.9 GHz 6-Core Intel Core i9
 
